@@ -38,9 +38,17 @@ provider "kubernetes" {
 
 locals {
   grafana_url = format(
-    "http://192.168.64.2:%s",
+    "http://%s:%s",
+    data.kubernetes_ingress.this.status[0].load_balancer[0].ingress[0].ip,
     data.kubernetes_service.this.spec[0].port[0].node_port
   )
+}
+
+data "kubernetes_ingress" "this" {
+  metadata {
+    name      = helm_release.this.name
+    namespace = helm_release.this.namespace
+  }
 }
 
 data "kubernetes_service" "this" {
